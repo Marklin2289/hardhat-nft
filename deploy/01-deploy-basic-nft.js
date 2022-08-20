@@ -1,4 +1,3 @@
-const { lchown } = require("fs")
 const { network } = require("hardhat")
 const { developmentChains } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
@@ -7,11 +6,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
 
-    lchown("----------------------------------------------------")
-    arguments = []
-    const basicNft = await deploy("basicNft", {
+    log("----------------------------------------------------")
+    const args = []
+    const basicNft = await deploy("BasicNft", {
         from: deployer,
-        args: arguments,
+        args: args,
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
@@ -19,8 +18,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     // verify the deployment
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
-        await verify(basicNft.address, this.arguments)
+        await verify(basicNft.address, args)
     }
+    log("--------------------------------")
 }
 
-module.exports.tags = ["all", "basicnft", "main"]
+// module.exports.tags = ["all", "basicnft", "main"]
