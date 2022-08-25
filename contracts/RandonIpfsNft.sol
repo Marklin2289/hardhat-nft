@@ -7,6 +7,9 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "hardhat/console.sol";
 
+// ERROR
+error RandomIpfsNft__RangeOutOfBounds();
+
 contract RandomIpfsNft is VRFConsumerBaseV2, ERC721 {
     // when we mint and  NFT, we will trigger a Chainlink VRF to get us a random number
     //  using that number, we will get a random NFT
@@ -17,6 +20,13 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721 {
 
     // users have to pay to min an NFT
     // the owner of the contract can withdraw the ETH
+
+    // Type Declarations
+    enum Breed {
+        PUG,
+        SHIBA_INU,
+        ST_BERNARD
+    }
 
     // Chainlink VRF Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -63,7 +73,6 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721 {
         // therefore, we need to set a mapping connect the owner and requestId
         address dogOwner = s_requestIdToSender[requestId]; // => msg.sender
         uint256 newTokenId = s_tokenCounter; // => s_tokenCounter
-        _safeMint(dogOwner, newTokenId);
         uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE;
         // 0 - 99
         // 7 -> PUG
@@ -71,7 +80,23 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721 {
         // 88 -> St. Bernard
         // 45 -> St. Bernard
 
-        // getBreedFromModdedRng()
+        Breed dogBreed = getBreedFromModdedRng(moddedRng);
+        _safeMint(dogOwner, newTokenId);
+    }
+
+    function getBreedFromModdedRng(uint256 moddedRng) public pure returns (Breed) {
+        uint256 cumulativeSum = 0;
+        uint256[3] memory chanceArray = getChanceArray();
+        // moddedRng = 8
+        // i = 0
+        // cumulativeSum = 0
+        for (uint256 i = 0; i < chanceArray.length; i++) {
+            if (moddedRng >= cumulativeSum && moddedRng < cumulativeSum + chanceArray[i]) {
+                return Breed(i);
+            }
+            cumulativeSum += chanceArray[i];
+        }
+        revert RandomIpfsNft__RangeOutOfBounds();
     }
 
     function getChanceArray() public pure returns (uint256[3] memory) {
