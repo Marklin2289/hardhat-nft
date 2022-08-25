@@ -26,6 +26,9 @@ contract RandomIpfsNft is VRFConsumerBaseV2 {
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
+    // VRF Helpers
+    mapping(uint256 => address) public s_requestIdToSender;
+
     constructor(
         address vrfCoordinatorV2,
         uint64 subscriptionId,
@@ -47,12 +50,15 @@ contract RandomIpfsNft is VRFConsumerBaseV2 {
             i_callbackGasLimit,
             NUM_WORDS
         );
+        s_requestIdToSender[requestId] = msg.sender;
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
-        internal
-        override
-    {}
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
+        // _safeMint(msg.sender, s_tokenCounter);
+        // msg.sender is actually the chainlink node not the actual owner
+        // therefore, we need to set a mapping connect the owner and requestId
+        address dogOwner = s_requestIdToSender[requestId];
+    }
 
     function tokenURI(uint256) public {}
 }
