@@ -7,15 +7,19 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "hardhat/console.sol";
 
-contract RandomIpfsNft is ERC721URIStorage, VRFConsumerBaseV2, Ownable{
-    // TYPES[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[P]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
-    enum Breed {
-        PUG,
-        SHIBA_INU,
-        ST_BERNARD
-    }
-}
+contract RandomIpfsNft {
+    // when we mint and  NFT, we will trigger a Chainlink VRF to get us a random number
+    //  using that number, we will get a random NFT
+    // PUG, Shiba Inu, St. Bernard
+    // PUG super rare
+    // shiba sort of rare
+    // St. bernard common
 
-    //Chainlink VRF variables
-    VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
-    uint64 private immutable i_subscriptionId;
+    // users have to pay to min an NFT
+    // the owner of the contract can withdraw the ETH
+    function requestNft() public {}
+
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal {}
+
+    function tokenURI(uint256) public {}
+}
