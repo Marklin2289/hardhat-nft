@@ -6,6 +6,12 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
 
+    // get the IPFS hashes of our images
+
+    // 1. With our own IPFS nodes. https://docs.ipfs.io/
+    // 2. Pinata https://www.pinata.cloud (we are going to use this)
+    // 3. NFT.storage https://nft.storage
+
     let vrfCoordinatorV2MockAddress, subscriptionId
     if (developmentChains.includes(network.name)) {
         const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
