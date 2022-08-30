@@ -5,12 +5,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-
+    let tokenUris
     // get the IPFS hashes of our images
 
     // 1. With our own IPFS nodes. https://docs.ipfs.io/
     // 2. Pinata https://www.pinata.cloud (we are going to use this)
     // 3. NFT.storage https://nft.storage
+    if (process.env.UPLOAD_TO_PINATA == "true") {
+        tokenUris = await handleTokenUris()
+    }
 
     let vrfCoordinatorV2MockAddress, subscriptionId
     if (developmentChains.includes(network.name)) {
@@ -32,4 +35,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         // tokenURIs
         networkConfig[chainId].mintFee,
     ]
+}
+
+// create function handleTokenUris
+async function handleTokenUris() {
+    tokenUris = []
+
+    return tokenUris
 }
