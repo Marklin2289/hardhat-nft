@@ -1,5 +1,8 @@
 const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
+const { storageImages } = require("../utils/uploadToPinata")
+
+const imagesLocation = "./images/randomNft"
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
@@ -27,14 +30,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         subscriptionId = networkConfig[chainId].subscriptionId
     }
     log("---------------------------------------")
-    const args = [
-        vrfCoordinatorV2Address,
-        subscriptionId,
-        networkConfig[chainId].gasLane,
-        networkConfig[chainId].callbackGasLimit,
-        // tokenURIs
-        networkConfig[chainId].mintFee,
-    ]
+    await storageImages(imagesLocation)
+    // const args = [
+    //     vrfCoordinatorV2Address,
+    //     subscriptionId,
+    //     networkConfig[chainId].gasLane,
+    //     networkConfig[chainId].callbackGasLimit,
+    //     // tokenURIs
+    //     networkConfig[chainId].mintFee,
+    // ]
 }
 
 // create function handleTokenUris
@@ -43,3 +47,5 @@ async function handleTokenUris() {
 
     return tokenUris
 }
+
+module.exports.tags = ["all", "randomipfs", "main"]
