@@ -9,6 +9,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
     let tokenUris
+    let vrfCoordinatorV2Address, subscriptionId
     // get the IPFS hashes of our images
 
     // 1. With our own IPFS nodes. https://docs.ipfs.io/
@@ -18,15 +19,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         tokenUris = await handleTokenUris()
     }
 
-    let vrfCoordinatorV2MockAddress, subscriptionId
-    if (developmentChains.includes(network.name)) {
+    if (chainId == 31337) {
+        // create VRFV2 Subscription
         const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
-        const tx = await vrfCoordinatorV2Mock.createSubscription()
-        const txReceipt = await tx.wait(1)
-        subscriptionId = txReceipt.events[0].args.subId
+        const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
+        const transactionReceipt = await transactionResponse.wait()
+        subscriptionId = transactionReceipt.events[0].args.subId
+        // Fund the subscription
+        // Our mock makes it so we don't actually have to worry about sending fund
     } else {
-        vrfCoordinatorV2MockAddress = networkConfig[chainId].vrfCoordinatorV2
+        vrfCoordinatorV2Address = networkConfig[chainId].vrfCoordinatorV2
         subscriptionId = networkConfig[chainId].subscriptionId
     }
     log("---------------------------------------")
