@@ -3,8 +3,8 @@ const path = require("path")
 const fs = require("fs")
 
 async function storeImages(imagesFilePath) {
-    const fullImagePath = path.resolve(imagesFilePath)
-    const files = fs.readdirSync(fullImagePath)
+    const fullImagesPath = path.resolve(imagesFilePath)
+    const files = fs.readdirSync(fullImagesPath)
     console.log(files)
 }
 
