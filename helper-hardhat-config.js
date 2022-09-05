@@ -1,9 +1,19 @@
 const networkConfig = {
+    default: {
+        name: "hardhat",
+        subscriptionId: "8628",
+        ethUsdPriceFeed: "0x9326BFA02ADD2366b30bacB125260Af641031331",
+        gasLane: "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc", // 30 gwei
+        interval: "30",
+        mintFee: "10000000000000000", // 0.01 ETH
+        callbackGasLimit: "500000", // 500,000 gas
+    },
     31337: {
         name: "localhost",
         subscriptionId: "8628",
         ethUsdPriceFeed: "0x9326BFA02ADD2366b30bacB125260Af641031331",
         gasLane: "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc", // 30 gwei
+        interval: "30",
         mintFee: "10000000000000000", // 0.01 ETH
         callbackGasLimit: "500000", // 500,000 gas
     },
