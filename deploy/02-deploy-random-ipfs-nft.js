@@ -1,13 +1,21 @@
 const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
-const { storeImages } = require("../utils/uploadToPinata")
+const { storeImages, storeTokenUriMetadata } = require("../utils/uploadToPinata")
 
 const imagesLocation = "./images/randomNft"
-let tokenUris = [
-    "ipfs://QmaVkBn2tKmjbhphU7eyztbvSQU5EXDdqRyXZtRhSGgJGo",
-    "ipfs://QmYQC5aGZu2PTH8XzbJrbDnvhj3gVs7ya33H9mqUNvST3d",
-    "ipfs://QmZYmH5iDbD6v3U2ixoVAjioSzvWJszDzYdbeCLquGSpVm",
-]
+const metadataTemplate = {
+    name: "",
+    description: "",
+    image: "",
+    attributes: [
+        {
+            trait_type: "Cuteness",
+            value: 100,
+        },
+    ],
+}
+
+let tokenUris = []
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
@@ -38,7 +46,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         subscriptionId = networkConfig[chainId].subscriptionId
     }
     log("---------------------------------------")
-    await storeImages(imagesLocation)
+    // await storeImages(imagesLocation)
+
     // const args = [
     //     vrfCoordinatorV2Address,
     //     subscriptionId,
@@ -53,6 +62,24 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 async function handleTokenUris() {
     tokenUris = []
     // storage the Image in IPFS
+    // storage the metadata in IPFS
+    const { responses: imageUploadResponses, files } = await storeImages(imagesLocation)
+    // loot thru the response
+    for (imageUploadResponseIndex in imageUploadResponses) {
+        // create metadata
+        // upload the metadata
+        let tokenUriMetadata = { ...metadataTemplate }
+        // pug.png, st-bernard.png, shiba-inu.png
+        tokenUriMetadata.name = files[imageUploadResponseIndex].replace("png", "")
+        tokenUriMetadata.description = `An adorable ${tokenUriMetadata.name} pug`
+        tokenUriMetadata.image = `ipfs://${imageUploadResponses[imageUploadResponseIndex].IpfsHash}`
+        console.log(`Uploading ${tokenUriMetadata.name}...`)
+        // store the JSON to pinata /IPFS
+        const metadataUploadResponse = await storeTokenUriMetadata(tokenUriMetadata)
+        tokenUris.push(`ipfs://${metadataUploadResponse.IpfsHash}`)
+    }
+    console.log("Token URIs Uploaded! They are :")
+    console.log(tokenUris)
     return tokenUris
 }
 
