@@ -16,13 +16,15 @@ const metadataTemplate = {
     ],
 }
 
-let tokenUris = []
-
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-    let tokenUris
+    let tokenUris = [
+        "ipfs://QmaKXAj5J5tJKUHaRVYCGQVFtmS21h9PuHH1ZPyPLRPhVE",
+        "ipfs://QmXWUG9evRk9G3U1vYhgVy9ezWjjGhHujVsa5KYQCnSHUF",
+        "ipfs://QmTFjzNcbGGrAQxqGJ4QoJyCx1K2M8PYYAECZ6f3AZGdYL",
+    ]
     let vrfCoordinatorV2Address, subscriptionId
     // get the IPFS hashes of our images
     if (process.env.UPLOAD_TO_PINATA == "true") {
