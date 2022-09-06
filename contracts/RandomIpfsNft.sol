@@ -11,6 +11,7 @@ import "hardhat/console.sol";
 error RandomIpfsNft__RangeOutOfBounds();
 error RandomIpfsNft__NeedMoreETHSent();
 error RandomIpfsNft__TransferFailed();
+error RandomIpfsNft__AlreadyInitialized();
 
 contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
     // when we mint and  NFT, we will trigger a Chainlink VRF to get us a random number
@@ -47,6 +48,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
     // string[] internal s_dogTokenUris = ["dfagrgsaf", "fsdf3435", "34131afsdg"];
     string[] internal s_dogTokenUris;
     uint256 internal immutable i_mintFee;
+    bool private s_initialized;
 
     // Events
     event NftRequested(uint256 indexed requestId, address requester);
@@ -67,6 +69,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         i_callbackGasLimit = callbackGasLimit;
         s_dogTokenUris = dogTokenUris;
         i_mintFee = mintFee;
+        _initializedContract(dogTokenUris);
     }
 
     function requestNft() public payable returns (uint256 requestId) {
@@ -131,6 +134,14 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         return [10, 30, MAX_CHANCE_VALUE];
     }
 
+    function _initializedContract(string[3] memory dogTokenUris) private {
+        if (s_initialized) {
+            revert RandomIpfsNft__AlreadyInitialized();
+        }
+        s_dogTokenUris = dogTokenUris;
+        s_initialized = true;
+    }
+
     // since we have _setTokenURI(); we dont need tokenURI().
     // function tokenURI(uint256) public view override returns (string memory) {}
 
@@ -146,7 +157,8 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
     function getTokenCounter() public view returns (uint256) {
         return s_tokenCounter;
     }
-    // function getInitialized() public view returns (bool) {
-    //     return s_initialized;
-    // }
+
+    function getInitialized() public view returns (bool) {
+        return s_initialized;
+    }
 }
