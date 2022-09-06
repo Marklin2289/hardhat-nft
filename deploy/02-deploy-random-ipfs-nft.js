@@ -3,6 +3,7 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 const { storeImages, storeTokenUriMetadata } = require("../utils/uploadToPinata")
 const { verify } = require("../utils/verify")
 
+const FUND_AMOUNT = "1000000000000000000000"
 const imagesLocation = "./images/randomNft"
 const metadataTemplate = {
     name: "",
@@ -15,6 +16,7 @@ const metadataTemplate = {
         },
     ],
 }
+// let tokenUris = [] // move into module.exports with .env false on UPLOAD_TO_PINATA
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
@@ -25,7 +27,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         "ipfs://QmXWUG9evRk9G3U1vYhgVy9ezWjjGhHujVsa5KYQCnSHUF",
         "ipfs://QmTFjzNcbGGrAQxqGJ4QoJyCx1K2M8PYYAECZ6f3AZGdYL",
     ]
+
     let vrfCoordinatorV2Address, subscriptionId
+
     // get the IPFS hashes of our images
     if (process.env.UPLOAD_TO_PINATA == "true") {
         tokenUris = await handleTokenUris()
@@ -42,6 +46,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         const tx = await vrfCoordinatorV2Mock.createSubscription()
         const txReceipt = await tx.wait(1)
         subscriptionId = txReceipt.events[0].args.subId
+        await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
         // Fund the subscription
         // Our mock makes it so we don't actually have to worry about sending fund
     } else {
