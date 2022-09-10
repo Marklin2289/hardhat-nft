@@ -23,7 +23,7 @@ contract DynamicSvgNft is ERC721, Ownable {
 
     mapping(uint256 => int256) private s_tokenIdToHighValues;
     AggregatorV3Interface internal immutable i_priceFeed;
-    // event CreateNFT(uint256 indexed tokenId, int256 highValue);
+    event CreateNFT(uint256 indexed tokenId, int256 highValue);
 
     constructor(address priceFeedAddress, string memory lowSvg, string memory highSvg)ERC721("Dynamic SVG NFT", "DSN"){
         s_tokenCounter = 0; // initialize value
@@ -41,9 +41,11 @@ contract DynamicSvgNft is ERC721, Ownable {
         return string(abi.encodePacked(base64EncodedSvgPrefix, svgBase64Encoded));
     }
 
-    function mintNft()public {
+    function mintNft(int256 highValue)public {
+        s_tokenIdToHighValues[s_tokenCounter] = highValue;
         _safeMint(msg.sender, s_tokenCounter);
         s_tokenCounter += 1;
+        emit CreateNFT(s_tokenCounter, highValue);
     }
 
     function _baseURI() internal pure override returns(string memory) {
@@ -55,7 +57,13 @@ contract DynamicSvgNft is ERC721, Ownable {
         //     revert ERC721Metadata_URI_QueryFor_NonExistentToken();
         // }
         require(_exists(tokenId), "URI Query for nonexistent token");
-        string memory imageURI = "Hi";
+        
+        // string memory imageURI = "Hi";
+        (, int256 price, , , ) = i_priceFeed.latestRoundData();
+        string memory imageURI = s_lowImageURI;
+        if(price >= s_tokenIdToHighValues[tokenId]) {
+            imageURI = s_highImageURI;
+        }
 
         return
             string(
