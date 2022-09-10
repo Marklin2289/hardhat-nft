@@ -36,3 +36,5 @@ module.exports = async function ({ getNameDAccounts, deployments }) {
 }
 
 module.exports.tags = ["all", "dynamicsvg", "main"]
+
+// after finishing 03-deploy run yarn hardhat deploy --tags dynamicsvg,mocks
