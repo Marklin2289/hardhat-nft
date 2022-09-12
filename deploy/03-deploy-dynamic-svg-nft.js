@@ -21,10 +21,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const highSVG = fs.readFileSync("./images/dynamicNft/happy.svg", { encoding: "utf8" })
 
     log("----------------------------------------------------")
-    arguments = [ethUsdPriceFeedAddress, lowSVG, highSVG]
+    args = [ethUsdPriceFeedAddress, lowSVG, highSVG]
     const dynamicSvgNft = await deploy("DynamicSvgNft", {
         from: deployer,
-        args: arguments,
+        args: args,
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
@@ -32,7 +32,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     // Verify the deployment
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
-        await verify(dynamicSvgNft.address, arguments)
+        await verify(dynamicSvgNft.address, args)
     }
 }
 
