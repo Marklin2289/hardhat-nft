@@ -16,7 +16,7 @@ module.exports = async ({ getNamedAccounts }) => {
     const dynamicSvgNft = await ethers.getContract("DynamicSvgNft", deployer)
     const dynamicSvgNftMinTx = await dynamicSvgNft.mintNft(highValue)
     await dynamicSvgNftMinTx.wait(1)
-    console.log("---------------------------------------------------------------------")
+    console.log("----------------------------High Value-------------------------------------")
     console.log(`Dynamic SVG NFT index 0 tokenURI is ${await dynamicSvgNft.tokenURI(0)}`)
 
     // random IPFS NFT mint

@@ -1,40 +1,39 @@
-const { developmentChains, networkConfig } = require("../helper-hardhat-config")
-const { getNamedAccounts, network, ethers } = require("hardhat")
-const fs = require("fs")
+const { network } = require("hardhat")
+const { networkConfig, developmentChains } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
+const fs = require("fs")
 
-module.exports = async function ({ getNameDAccounts, deployments }) {
+module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-
     let ethUsdPriceFeedAddress
 
-    if (developmentChains.includes(network.name)) {
-        const EthUsdAggregator = await ethers.getContract("MockV3Aggregator")
+    if (chainId == 31337) {
+        // Find ETH/USD price feed
+        const EthUsdAggregator = await deployments.get("MockV3Aggregator")
         ethUsdPriceFeedAddress = EthUsdAggregator.address
     } else {
-        ethUsdPriceFeedAddress = networkConfig[chainId].ethUsdPriceFeedAddress
+        ethUsdPriceFeedAddress = networkConfig[chainId].ethUsdPriceFeed
     }
 
-    const lowSVG = await fs.readFileSync("./images/dynamicNft/frown.svg", { encoding: "utf8" })
-    const highSVG = await fs.readFileSync("./images/dynamicNft/happy.svg", { encoding: "utf8" })
+    const lowSVG = fs.readFileSync("./images/dynamicNft/frown.svg", { encoding: "utf8" })
+    const highSVG = fs.readFileSync("./images/dynamicNft/happy.svg", { encoding: "utf8" })
 
-    log("----------------------------------------------------------------")
-    args = [ethUsdPriceFeedAddress, highSVG, lowSVG]
-    const DynamicSvgNft = await deploy("DynamicSvgNft", {
+    log("----------------------------------------------------")
+    arguments = [ethUsdPriceFeedAddress, lowSVG, highSVG]
+    const dynamicSvgNft = await deploy("DynamicSvgNft", {
         from: deployer,
-        args: args,
+        args: arguments,
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
 
+    // Verify the deployment
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
-        await verify(DynamicSvgNft.address, args)
+        await verify(dynamicSvgNft.address, arguments)
     }
 }
 
 module.exports.tags = ["all", "dynamicsvg", "main"]
-
-// after finishing 03-deploy run yarn hardhat deploy --tags dynamicsvg,mocks
